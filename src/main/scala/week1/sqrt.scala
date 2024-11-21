@@ -1,8 +1,10 @@
 package week1
+import scala.annotation.tailrec
 
 def square(x: Double) = x * x
 def abs(x: Double) = if x > 0 then x else -x
 
+@tailrec
 def sqrtIter(guess: Double, x: Double): Double =
   if isGoodEnough(guess, x) then guess
   else sqrtIter(improve(guess, x), x)
