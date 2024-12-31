@@ -53,12 +53,33 @@ object RecFun extends RecFunInterface:
 
   /** Exercise 3
     */
-  def countChange(money: Int, coins: List[Int]): Int = {
-    if money == 0 then 1
-    else if money > 0 && coins.nonEmpty then
-      countChange(money - coins.head, coins) + countChange(money, coins.tail)
-    else 0
+//  def countChange(money: Int, coins: List[Int]): Int = {
+//    if money == 0 then 1
+//    else if money > 0 && coins.nonEmpty then
+//      countChange(money - coins.head, coins) + countChange(money, coins.tail)
+//    else 0
+//  }
+
+case class Candidates(coins: Map[Int, Int], remaining: Int)
+def countChange(money: Int, coins: List[Int]): Int = {
+  def helper(coins: List[Int], acc: List[Candidates]): Int = {
+    coins match {
+      case Nil => acc.count(_.remaining == 0)
+      case h :: t => {
+        val newAcc = acc.flatMap { sol =>
+          val numCoins = sol.remaining / h
+          (0 to numCoins).map(n =>
+            Candidates(sol.coins ++ Map((h, n)), sol.remaining - h * n)
+          )
+        }
+        helper(t, newAcc)
+      }
+    }
   }
+
+  // List cannot be empty else flatmap will not iterate
+  helper(coins, List(Candidates(Map.empty, money)))
+}
 
   /**
    * countChange(4,List(1,2))
