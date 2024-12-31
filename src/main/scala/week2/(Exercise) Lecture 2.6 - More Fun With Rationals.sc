@@ -90,6 +90,6 @@ val n = Rational(42, 33)
 
 Rational(1, 2).min(Rational(2, 3))
 x + y // x.+(y)
-x * y
-z < x
+x * y // x.*(y)
+z < x // z.<(x)
 y min z //y.min(z)
