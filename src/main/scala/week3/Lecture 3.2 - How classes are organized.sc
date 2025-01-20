@@ -7,4 +7,4 @@ trait Movable
 class Square extends  Shape, Planar, Movable
 end Square
 
-throw Exc
+throw Exception()
