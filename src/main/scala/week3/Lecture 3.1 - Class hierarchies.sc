@@ -51,7 +51,6 @@ object IntSet:
        * Need techniques to decompose data structures to find out what's inside
        */
       left.union(right).union(other).incl(elem)
-
   end NonEmpty
 
 //  @main def birthday(name: String, age: Int) =
