@@ -80,12 +80,14 @@ Why?
  * keep program lightweight & efficient: less memory & processing power
  */
 
-val firstToy = toyBox.getToys().head
-// firstToy.dressUp() => error because Toy doesn;t know dressUp() exists
+toyBox.getToys().head.isInstanceOf[Doll]
+val firstToy = toyBox.getToys().head.asInstanceOf[Doll]
+classOf[Doll].getDeclaredMethods()(0).
+ firstToy.dressUp() //=> error because Toy doesn;t know dressUp() exists
 
 // Fix this
-firstToy match {
-  case d: Doll => d.dressUp()
-  case t: Truck => t.honk()
-  case _ => println("Unknown toy!")
-}
+//firstToy match {
+//  case d: Doll => d.dressUp()
+//  case t: Truck => t.honk()
+//  case _ => println("Unknown toy!")
+//}
