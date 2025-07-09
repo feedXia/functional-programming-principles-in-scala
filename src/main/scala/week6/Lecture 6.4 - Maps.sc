@@ -1,3 +1,4 @@
+import jdk.nashorn.internal.runtime.PropertyMap.newMap
 val romanNumerals = Map("I" -> 1, "V" -> 5, "X" -> 10)
 val capitalOfCountry = Map("US" -> "Washington", "Switzerland" -> "Bern")
 
@@ -84,18 +85,56 @@ Map(0 -> 5, 1 -> 2, 3 -> 1)
 
 // design a Polynom class that represents polynomials as maps
 /* recall maps are PARTIAL FUNCTIONS: applying a map to kv in map(key) could lead to exception if k not in map
-this is inconvenient as can ntreat missing coefficients as cases where it's 0
+this is inconvenient as can treat missing coefficients as cases where it's 0
 operation withDefaultValue turns a map into a total function
  */
 val cap1 = capitalOfCountry.withDefaultValue("<unknown>")
 cap1("Andorra")
 
 class Polynom(nonZeroTerms: Map[Int, Double]):
+  // Define a secondary constructor to work directly with params without user specifying Map
+  /*
+  vararg parameters
+  repeated param
+  type followed by *
+  Internally is a Seq data structure
+   */
+
+  /** @param bindings:
+    *   seen as Seq[(Int, double)]
+    */
+  def this(bindings: (Int, Double)*) = this(bindings.toMap)
+
+//  def Polynom(bindings: (Int, Double)*) = Polynom(bindings.toMap.withDefaultValue(0.0))
 
   val terms = nonZeroTerms.withDefaultValue(0.0)
 
-  def +(other: Polynom): Polynom = Polynom(this.terms ++ other.terms)
+  def +(other: Polynom): Polynom =
+    def addTerm(terms: Map[Int, Double], term: (Int, Double)) =
+      val (exp, coeff) = term
+      terms + (exp -> (terms(exp) + coeff))
+    Polynom(
+//    terms ++ other.terms.map((exp, coeff) => exp -> (terms(exp) + coeff))
+      // possibly faster as skips intermediate step of building & going into second map
+      other.terms.foldLeft(terms)((acc, t) => addTerm(acc, t))
+    )
 
-  override def toString = terms.toString
+  override def toString =
+    def toXTerm(exp: Int) = if exp == 0 then "" else s"x^$exp"
+    terms.toList.sorted.reverse match
+      case Nil => "0"
+      case (hexp, hcoeff) :: t =>
+        val headTerm = s"$hcoeff${toXTerm(hexp)}"
+        val termsList =
+          for (exp, coeff) <- t
+          yield
+            val sign = if coeff < 0 then " - " else " + "
+            s"$sign${coeff.abs}${toXTerm(exp)}"
+        (headTerm +: termsList).mkString("")
 
-val x = Polynom(Map(0 -> 2, 1 -> 3, 2 -> 1))
+val v = Polynom(2 -> 2.0) // 2x^2  why do i need the .0 here?
+val w = Polynom(2 -> -2.0) // -2x^2
+val x = Polynom(0 -> 2, 1 -> 3, 2 -> 1)
+val y = Polynom()
+val z = Polynom(0 -> 2, 1 -> -3, 2 -> 1) // handle negative coeffs
+x + x + z
